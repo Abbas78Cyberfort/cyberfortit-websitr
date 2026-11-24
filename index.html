@@ -883,4 +883,16 @@ applyAria();
 function sweep(){document.querySelectorAll('[id*="netlify-badge"],[class*="netlify-badge"],iframe[src*="netlify"],a[href*="netlify.com/?utm"]').forEach(function(n){n.remove()})}
 try{new MutationObserver(function(m){m.forEach(function(r){r.addedNodes.forEach(kill)});sweep()}).observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
 sweep();})();
+ <script>
+/* Reference gallery (etna-1.png … etna-5.png) */
+(function(){var g=document.getElementById('refGallery');if(!g)return;
+var im=g.querySelectorAll('.g-stage img'),dots=g.querySelectorAll('.g-dot'),cnt=g.querySelector('.g-count'),i=0,n=im.length;
+function go(k){i=(k+n)%n;im.forEach(function(e,j){e.classList.toggle('is-active',j===i)});dots.forEach(function(e,j){e.classList.toggle('is-active',j===i)});cnt.textContent=(i+1)+' / '+n}
+g.querySelector('.g-prev').onclick=function(){go(i-1)};g.querySelector('.g-next').onclick=function(){go(i+1)};
+dots.forEach(function(d){d.onclick=function(){go(+d.dataset.go)}});
+g.addEventListener('keydown',function(e){if(e.key==='ArrowLeft')go(i-1);if(e.key==='ArrowRight')go(i+1)});
+var x=null;g.addEventListener('touchstart',function(e){x=e.touches[0].clientX},{passive:true});
+g.addEventListener('touchend',function(e){if(x===null)return;var d=e.changedTouches[0].clientX-x;if(Math.abs(d)>40)go(i+(d<0?1:-1));x=null});
+})();
+</script>
 </script></body></html>
