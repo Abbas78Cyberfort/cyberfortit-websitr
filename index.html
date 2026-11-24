@@ -387,6 +387,18 @@ a[href^="tel:"]:hover,a[href^="mailto:"]:hover{text-decoration:underline;text-un
 .socials a{font:11px 'DM Mono',monospace;letter-spacing:.8px;color:var(--mint);border:1px solid var(--line);border-radius:99px;padding:7px 14px;background:rgba(45,150,230,.07);transition:.2s}
 .socials a:hover{border-color:var(--green);transform:translateY(-2px)}
 .contact-line .socials{justify-content:flex-start;margin:6px 0 0}
+.ref-gallery{align-self:start;position:relative;border:1px solid var(--line);border-radius:15px;background:rgba(4,13,26,.88);overflow:hidden;outline:none}
+.ref-gallery:focus-visible{border-color:var(--green)}
+.g-stage{position:relative;height:clamp(230px,30vw,320px);background:#030a14}
+.g-stage img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;opacity:0;transition:opacity .35s;pointer-events:none}
+.g-stage img.is-active{opacity:1}
+.g-btn{position:absolute;top:calc(clamp(230px,30vw,320px)/2 - 20px);width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:rgba(2,6,16,.75);color:var(--mint);font:22px/1 Arial,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0 0 3px;transition:.2s}
+.g-btn:hover{border-color:var(--green);color:#fff}.g-prev{left:10px}.g-next{right:10px}
+.g-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;border-top:1px solid rgba(255,255,255,.07)}
+.g-count{font:11px 'DM Mono',monospace;color:var(--muted);letter-spacing:1px}
+.g-dots{display:flex;gap:8px}
+.g-dot{width:9px;height:9px;border-radius:50%;border:1px solid rgba(45,180,255,.5);background:transparent;padding:0;cursor:pointer}
+.g-dot.is-active{background:var(--green);border-color:var(--green)}
 .ref-quote{margin:16px 0;padding:14px 16px;border-left:3px solid var(--green);background:rgba(45,150,230,.06);border-radius:0 10px 10px 0;font-size:13px;line-height:1.8;color:#a1b3c3}.ref-quote b{display:block;color:var(--mint);font:11px 'DM Mono',monospace;letter-spacing:1px;margin-bottom:6px}
 .social-box{margin-top:20px;text-align:center}.social-box h3{margin-bottom:6px}.social-box .socials{margin:12px 0 0}
 .footer-sign{margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.06);font:11px/1.8 'DM Mono',monospace;color:#8fa3b8}
