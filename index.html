@@ -418,6 +418,8 @@ a[href^="tel:"]:hover,a[href^="mailto:"]:hover{text-decoration:underline;text-un
 @media(max-width:820px){.cov-grid,.ref-grid{grid-template-columns:1fr}}
 /* Hide the "Powered by Netlify" badge in case it is injected */
 .netlify-badge,#netlify-badge,[class*="netlify-badge"],[id*="netlify-badge"],a[href*="netlify.com/?utm"],a[href*="app.netlify.com/drop"],a[href^="https://www.netlify.com"][target="_blank"]:not(.keep),iframe[src*="netlify"],iframe[title*="Netlify" i],div[style*="netlify" i]{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;width:0!important;height:0!important}
+/* Centre hero + standards headings when the layout stacks (mobile/tablet); desktop two-column layout is unchanged */
+@media(max-width:900px){.hero-copy{text-align:center;margin-left:auto;margin-right:auto}.hero-copy .hero-buttons{justify-content:center}.standards-grid>div:first-child{text-align:center}}
 </style></head>
 <body>
 <!-- Built-in Cyberfort IT emblem (used automatically if logo.png is not found) -->
