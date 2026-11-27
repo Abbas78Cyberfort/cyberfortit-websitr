@@ -1,0 +1,18 @@
+CYBERFORT IT – ADDED SERVICE PAGES
+
+New pages:
+- /business-websites/
+- /restaurant-solutions/
+
+Shared assets:
+- /assets/business-pages.css
+- /assets/business-pages.js
+
+The main homepage remains index.html. Its desktop and mobile navigation now link to Business Websites.
+
+IMPORTANT BEFORE MIGRATION TO INLEED:
+1. The existing homepage forms use Netlify Forms. They need a compatible form handler before leaving Netlify.
+2. The new pages currently use mailto links for enquiries, so they do not depend on Netlify Forms.
+3. Test all links, language switching, mobile layout and canonical URLs on Netlify.
+4. Check whether Netlify deploy previews use the same root path behaviour. The new page assets use root-relative URLs.
+5. The QR ordering, loyalty and kitchen display items on the restaurant page are explicitly presented as optional future extensions, not as included live features.
