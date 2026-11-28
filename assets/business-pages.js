@@ -60,10 +60,12 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
         <input type="hidden" name="form-name" value="email-modal-form">
         <input type="hidden" name="recipient" id="cfModalRecipient" value="${DEFAULT_EMAIL}">
         <p hidden><label>Do not fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
-        <input id="cfNameInput" name="name" type="text" required placeholder="Ditt namn">
-        <input id="cfEmailInput" name="email" type="email" required placeholder="Din e-postadress">
-        <textarea id="cfMsgInput" name="message" required placeholder="Skriv ditt meddelande..."></textarea>
-        <button class="btn" id="cfModalSubmit" type="submit">SKICKA MEDDELANDE ↗</button>
+        <input id="cfNameInput" name="name" type="text" required placeholder="Name">
+        <input id="cfEmailInput" name="email" type="email" required placeholder="Email">
+        <label class="cf-field-label" id="cfSubjectLabel" for="cfSubjectSelect">What do you need help with?</label>
+        <select id="cfSubjectSelect" name="subject" required aria-label="What do you need help with?"></select>
+        <textarea id="cfMsgInput" name="message" required placeholder="Message"></textarea>
+        <button class="btn" id="cfModalSubmit" type="submit">Send Message ↗</button>
       </form>
       <div class="cf-modal-status" id="cfModalStatus" role="status" aria-live="polite" hidden></div>
       <div class="cf-modal-done" id="cfModalDone" hidden>
@@ -80,16 +82,39 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
   const submitBtn = document.getElementById('cfModalSubmit');
   const nameInput = document.getElementById('cfNameInput');
   const emailInput = document.getElementById('cfEmailInput');
+  const subjectSelect = document.getElementById('cfSubjectSelect');
   const msgInput = document.getElementById('cfMsgInput');
+
+  const subjectOptions = {
+    business: [
+      'New Website Design',
+      'Website Redesign',
+      'E-commerce / Online Store',
+      'SEO & Google Visibility',
+      'Website Maintenance & Security',
+      'Other / General Inquiry'
+    ],
+    restaurant: [
+      'Online Ordering System',
+      'Digital QR Menu',
+      'Online Payments',
+      'Restaurant Website',
+      'Order Management System',
+      'Other / General Inquiry'
+    ]
+  };
 
   const i18n = {
     sv: {
       title: 'Skriv till oss',
       to: 'Till',
-      namePh: 'Ditt namn',
-      emailPh: 'Din e-postadress',
-      msgPh: 'Skriv ditt meddelande...',
-      send: 'SKICKA MEDDELANDE ↗',
+      namePh: 'Name',
+      emailPh: 'Email',
+      subjFieldLabel: 'What do you need help with?',
+      subjPlaceholder: 'Select a Service',
+      subjRequiredMsg: 'Please select a service from the list.',
+      msgPh: 'Message',
+      send: 'Send Message ↗',
       sending: 'SKICKAR…',
       ok: 'Tack! Ditt meddelande har skickats till Cyberfort IT. Vi återkommer så snart vi kan.',
       err: 'Tyvärr gick något fel och meddelandet skickades inte. Försök igen eller ring <a href="tel:+46764113589">076-411 35 89</a>.',
@@ -98,10 +123,13 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     en: {
       title: 'Write to us',
       to: 'To',
-      namePh: 'Your name',
-      emailPh: 'Your email',
-      msgPh: 'Write your message...',
-      send: 'SEND MESSAGE ↗',
+      namePh: 'Name',
+      emailPh: 'Email',
+      subjFieldLabel: 'What do you need help with?',
+      subjPlaceholder: 'Select a Service',
+      subjRequiredMsg: 'Please select a service from the list.',
+      msgPh: 'Message',
+      send: 'Send Message ↗',
       sending: 'SENDING…',
       ok: 'Thank you! Your message has been sent to Cyberfort IT. We will get back to you as soon as possible.',
       err: 'Sorry, something went wrong and your message was not sent. Please try again or call <a href="tel:+46764113589">076-411 35 89</a>.',
@@ -113,13 +141,65 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     return localStorage.getItem('cf-page-lang') || document.documentElement.lang || 'sv';
   }
 
+  function populateSubjects(preferredSubj){
+    const L = curLang();
+    const t = i18n[L] || i18n.sv;
+    const pageType = document.body.dataset.page === 'restaurant' ? 'restaurant' : 'business';
+    const list = subjectOptions[pageType] || subjectOptions.business;
+    const prevVal = (preferredSubj !== undefined) ? preferredSubj : subjectSelect.value;
+
+    subjectSelect.innerHTML = '';
+    const phOpt = document.createElement('option');
+    phOpt.value = '';
+    phOpt.textContent = t.subjPlaceholder;
+    phOpt.selected = true;
+    subjectSelect.appendChild(phOpt);
+
+    let matched = false;
+    list.forEach(item => {
+      const opt = document.createElement('option');
+      opt.value = item;
+      opt.textContent = item;
+      if(prevVal && prevVal.toLowerCase() === item.toLowerCase()){
+        opt.selected = true;
+        matched = true;
+      }
+      subjectSelect.appendChild(opt);
+    });
+
+    if(prevVal && !matched){
+      const customOpt = document.createElement('option');
+      customOpt.value = prevVal;
+      customOpt.textContent = prevVal;
+      customOpt.selected = true;
+      subjectSelect.insertBefore(customOpt, subjectSelect.children[1] || null);
+      matched = true;
+    }
+
+    if(!matched){
+      subjectSelect.value = '';
+      phOpt.selected = true;
+    }
+    subjectSelect.setCustomValidity('');
+    form.dataset.cfSubject = subjectSelect.value || '';
+  }
+
+  subjectSelect.addEventListener('change', ()=>{
+    subjectSelect.setCustomValidity('');
+    form.dataset.cfSubject = subjectSelect.value || '';
+  });
+
   function applyModalTexts(){
     const t = i18n[curLang()] || i18n.sv;
     document.getElementById('cfModalTitle').textContent = t.title;
     document.getElementById('cfToLabel').textContent = t.to;
     nameInput.placeholder = t.namePh;
     emailInput.placeholder = t.emailPh;
+    const lblEl = document.getElementById('cfSubjectLabel');
+    if(lblEl) lblEl.textContent = t.subjFieldLabel;
+    subjectSelect.setAttribute('aria-label', t.subjFieldLabel);
     msgInput.placeholder = t.msgPh;
+    populateSubjects(subjectSelect.value || '');
     if(!submitBtn.disabled) submitBtn.textContent = t.send;
     doneBtn.textContent = t.close;
   }
@@ -129,19 +209,16 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     const cleanSubj = (subj || '').trim();
     document.getElementById('cfModalTo').textContent = targetAddr;
     document.getElementById('cfModalRecipient').value = targetAddr;
-    form.dataset.cfSubject = cleanSubj;
     form.hidden = false;
     form.reset();
+    msgInput.value = '';
     document.getElementById('cfModalRecipient').value = targetAddr;
-    form.dataset.cfSubject = cleanSubj;
-    if(cleanSubj && !msgInput.value){
-      msgInput.value = 'Subject: ' + cleanSubj + '\n\n';
-    }
     statusEl.hidden = true;
     statusEl.className = 'cf-modal-status';
     statusEl.innerHTML = '';
     doneEl.hidden = true;
     applyModalTexts();
+    populateSubjects(cleanSubj);
     backdrop.hidden = false;
     backdrop.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -197,7 +274,7 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
 
   function buildUrlEncodedBody(formEl, overrideFormName, extraFields){
     const fd = new FormData(formEl);
-    const subj = (formEl.dataset && formEl.dataset.cfSubject) ? formEl.dataset.cfSubject.trim() : '';
+    const subj = (subjectSelect && subjectSelect.value) ? subjectSelect.value.trim() : ((formEl.dataset && formEl.dataset.cfSubject) ? formEl.dataset.cfSubject.trim() : '');
     const rawMsg = String(fd.get('message') || '');
     if(subj && !rawMsg.startsWith('Subject: ' + subj)){
       fd.set('message', 'Subject: ' + subj + '\n\n' + rawMsg);
@@ -216,10 +293,9 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     const fd = new FormData(formEl);
     const name = String(fd.get('name') || '').trim();
     const email = String(fd.get('email') || '').trim();
-    const recipient = String(fd.get('recipient') || DEFAULT_EMAIL).trim();
-    const subj = (formEl.dataset && formEl.dataset.cfSubject) ? formEl.dataset.cfSubject.trim() : '';
-    const rawMsg = String(fd.get('message') || '').trim();
-    const fullMessage = (subj ? ('Subject: ' + subj + '\n') : '') + 'To: ' + recipient + '\n\n' + rawMsg;
+    const recipient = DEFAULT_EMAIL;
+    const subj = (subjectSelect && subjectSelect.value) ? subjectSelect.value.trim() : '';
+    const exactMessage = String(fd.get('message') || '');
 
     const payload = {
       access_key: accessKey,
@@ -228,8 +304,8 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
       name: name,
       email: email,
       replyto: email,
-      recipient: recipient,
-      message: fullMessage
+      to_email: recipient,
+      message: exactMessage
     };
 
     const res = await fetch('https://api.web3forms.com/submit', {
@@ -286,6 +362,14 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
   form.addEventListener('submit', async function(e){
     e.preventDefault();
     const t = i18n[curLang()] || i18n.sv;
+    const selectedService = subjectSelect ? String(subjectSelect.value || '').trim() : '';
+    if(!selectedService){
+      subjectSelect.setCustomValidity(t.subjRequiredMsg);
+      subjectSelect.reportValidity();
+      subjectSelect.focus();
+      return;
+    }
+    subjectSelect.setCustomValidity('');
     submitBtn.disabled = true;
     submitBtn.textContent = t.sending;
     statusEl.hidden = true;

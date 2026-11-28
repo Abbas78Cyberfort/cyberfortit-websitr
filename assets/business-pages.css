@@ -32,8 +32,12 @@
 .cf-to-line{margin:0 0 16px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace}
 .cf-to-line b{color:var(--cyan);font-weight:500}
 .cf-modal-form{display:grid;gap:12px}
-.cf-modal-form input,.cf-modal-form textarea{width:100%;padding:12px 13px;background:#020812;border:1px solid rgba(88,196,255,.22);border-radius:9px;color:#fff;font-family:Inter,Arial,sans-serif;font-size:13px;outline:none}
-.cf-modal-form input:focus,.cf-modal-form textarea:focus{border-color:var(--cyan)}
+.cf-field-label{display:block;font-size:12px;font-weight:600;color:#9ed4be;margin-bottom:-4px}
+.cf-modal-form input,.cf-modal-form select,.cf-modal-form textarea{width:100%;padding:12px 13px;background:#030d12;border:1px solid rgba(85,230,165,.28);border-radius:9px;color:#eafaf2;font-family:Inter,Arial,sans-serif;font-size:13px;outline:none;transition:border-color .18s,box-shadow .18s}
+.cf-modal-form select{appearance:none;-webkit-appearance:none;background-color:#030e13;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='13' height='13' viewBox='0 0 24 24' fill='none' stroke='%2355e6a5' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:38px;cursor:pointer}
+.cf-modal-form select option{background:#05141a;color:#eafaf2}
+.cf-modal-form select option:checked{background:#0d3528;color:#55e6a5}
+.cf-modal-form input:focus,.cf-modal-form select:focus,.cf-modal-form textarea:focus{border-color:var(--green);box-shadow:0 0 0 2px rgba(85,230,165,.14)}
 .cf-modal-form textarea{min-height:118px;resize:vertical}
 .cf-modal-status{margin-top:12px;padding:11px 13px;border-radius:9px;font-size:12px;line-height:1.55}
 .cf-modal-status.ok{background:rgba(22,133,189,.18);border:1px solid rgba(88,196,255,.45);color:#bfeaff}
