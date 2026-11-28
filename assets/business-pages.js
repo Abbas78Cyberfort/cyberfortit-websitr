@@ -158,52 +158,41 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
   };
 
   function curLang(){
-    return localStorage.getItem('cf-page-lang') || document.documentElement.lang || 'sv';
+    const saved = localStorage.getItem('cf-page-lang');
+    if(saved === 'en' || saved === 'sv') return saved;
+    const htmlLang = (document.documentElement.lang || '').toLowerCase();
+    return htmlLang.startsWith('en') ? 'en' : 'sv';
   }
 
-  function populateSubjects(preferredSubj){
+  function populateSubjects(selectedVal){
     const L = curLang() === 'en' ? 'en' : 'sv';
-    const otherLang = L === 'sv' ? 'en' : 'sv';
     const t = i18n[L] || i18n.sv;
     const pageType = document.body.dataset.page === 'restaurant' ? 'restaurant' : 'business';
     const pageGroup = subjectOptions[pageType] || subjectOptions.business;
     const list = pageGroup[L] || pageGroup.sv;
-    const otherList = pageGroup[otherLang] || [];
-    const prevVal = (preferredSubj !== undefined) ? preferredSubj : subjectSelect.value;
+    const chosen = (selectedVal !== undefined) ? selectedVal : '';
 
     subjectSelect.innerHTML = '';
     const phOpt = document.createElement('option');
     phOpt.value = '';
     phOpt.textContent = t.subjPlaceholder;
-    phOpt.selected = true;
+    phOpt.disabled = true;
+    phOpt.selected = !chosen;
     subjectSelect.appendChild(phOpt);
 
-    let matched = false;
-    list.forEach((item, idx) => {
+    list.forEach(item => {
       const opt = document.createElement('option');
       opt.value = item;
       opt.textContent = item;
-      const prevLower = (prevVal || '').toLowerCase();
-      const otherItem = (otherList[idx] || '').toLowerCase();
-      if(prevVal && (prevLower === item.toLowerCase() || (otherItem && prevLower === otherItem))){
+      if(chosen && chosen === item){
         opt.selected = true;
-        matched = true;
       }
       subjectSelect.appendChild(opt);
     });
 
-    if(prevVal && !matched){
-      const customOpt = document.createElement('option');
-      customOpt.value = prevVal;
-      customOpt.textContent = prevVal;
-      customOpt.selected = true;
-      subjectSelect.insertBefore(customOpt, subjectSelect.children[1] || null);
-      matched = true;
-    }
-
-    if(!matched){
+    if(!chosen){
+      subjectSelect.selectedIndex = 0;
       subjectSelect.value = '';
-      phOpt.selected = true;
     }
     subjectSelect.setCustomValidity('');
     form.dataset.cfSubject = subjectSelect.value || '';
@@ -229,9 +218,8 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     doneBtn.textContent = t.close;
   }
 
-  function openContactModal(addr, subj){
+  function openContactModal(addr){
     const targetAddr = (addr && addr.trim()) ? addr.trim() : DEFAULT_EMAIL;
-    const cleanSubj = (subj || '').trim();
     document.getElementById('cfModalTo').textContent = targetAddr;
     document.getElementById('cfModalRecipient').value = targetAddr;
     form.hidden = false;
@@ -243,7 +231,7 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     statusEl.innerHTML = '';
     doneEl.hidden = true;
     applyModalTexts();
-    populateSubjects(cleanSubj);
+    populateSubjects('');
     backdrop.hidden = false;
     backdrop.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -264,12 +252,7 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
       const afterMailto = rawHref.replace(/^mailto:/i, '');
       const parts = afterMailto.split('?');
       const addr = decodeURIComponent(parts[0] || DEFAULT_EMAIL) || DEFAULT_EMAIL;
-      let subj = '';
-      if(parts[1]){
-        const params = new URLSearchParams(parts[1]);
-        subj = params.get('subject') || '';
-      }
-      openContactModal(addr, subj);
+      openContactModal(addr);
     }
   });
 
