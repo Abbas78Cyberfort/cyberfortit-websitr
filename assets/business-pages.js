@@ -55,7 +55,6 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
       <form class="cf-modal-form" id="cfModalForm" name="email-modal-form" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
         <input type="hidden" name="form-name" value="email-modal-form">
         <input type="hidden" name="recipient" id="cfModalRecipient" value="${DEFAULT_EMAIL}">
-        <input type="hidden" name="subject" id="cfModalSubject" value="">
         <p hidden><label>Do not fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
         <input id="cfNameInput" name="name" type="text" required placeholder="Ditt namn">
         <input id="cfEmailInput" name="email" type="email" required placeholder="Din e-postadress">
@@ -106,6 +105,8 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     }
   };
 
+  let currentSubject = '';   // subject from the clicked mailto: link – sent inside the message text
+
   function curLang(){
     return localStorage.getItem('cf-page-lang') || document.documentElement.lang || 'sv';
   }
@@ -125,11 +126,10 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     const targetAddr = (addr && addr.trim()) ? addr.trim() : DEFAULT_EMAIL;
     document.getElementById('cfModalTo').textContent = targetAddr;
     document.getElementById('cfModalRecipient').value = targetAddr;
-    document.getElementById('cfModalSubject').value = subj || '';
+    currentSubject = subj || '';
     form.hidden = false;
     form.reset();
     document.getElementById('cfModalRecipient').value = targetAddr;
-    document.getElementById('cfModalSubject').value = subj || '';
     statusEl.hidden = true;
     statusEl.className = 'cf-modal-status';
     statusEl.innerHTML = '';
@@ -173,32 +173,49 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     if(e.key === 'Escape' && !backdrop.hidden) closeContactModal();
   });
 
-  // Sends the form to Netlify Forms (same urlencoded POST the homepage uses).
-  // Tries "/" first (proven to work on the homepage), then the current page path as a fallback.
-  // The real HTTP status of every attempt is logged in the browser console to make problems easy to diagnose.
+  // Sends the message to Netlify Forms (urlencoded POST, exactly like the homepage forms).
+  // 1st choice: "email-modal-form" (same definition as on the homepage).
+  // Fallback:   "contact-form" (the homepage contact form) – only used if Netlify answers 404/other error for the first one.
+  // The subject is written into the message text, so no extra (unregistered) field is ever posted.
+  // The real HTTP status of every attempt is logged in the browser console.
   async function sendToNetlify(){
-    const data = new FormData(form);
-    // Netlify identifies the form by "form-name" – make sure it is always present
-    data.set('form-name', form.getAttribute('name') || 'email-modal-form');
-    const body = new URLSearchParams(data).toString();
-    const targets = [];
-    [window.CF_FORM_ENDPOINT, '/', window.location.pathname].forEach(function(u){
-      if(u && targets.indexOf(u) === -1) targets.push(u);
-    });
+    const honeypot = (form.elements['bot-field'] && form.elements['bot-field'].value) || '';
+    const message = (currentSubject ? 'Ämne: ' + currentSubject + '\n\n' : '') + msgInput.value +
+      '\n\n— Skickat från ' + window.location.pathname;
+    const attempts = [
+      { form: 'email-modal-form', targets: ['/', window.location.pathname], fields: {
+          'form-name': 'email-modal-form',
+          'bot-field': honeypot,
+          recipient: document.getElementById('cfModalRecipient').value,
+          name: nameInput.value, email: emailInput.value, message: message } },
+      { form: 'contact-form', targets: ['/'], fields: {
+          'form-name': 'contact-form',
+          'bot-field': honeypot,
+          name: nameInput.value, phone: '', email: emailInput.value,
+          subject: currentSubject || 'Förfrågan via cyberfortit.se', message: message } }
+    ];
+    if(window.CF_FORM_ENDPOINT) attempts[0].targets.unshift(window.CF_FORM_ENDPOINT);
+
     let lastErr = null;
-    for(const url of targets){
-      try{
-        const res = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body
-        });
-        if(res.ok) return;
-        lastErr = new Error('HTTP ' + res.status + ' from ' + url);
-        console.warn('[Cyberfort form] ' + lastErr.message);
-      }catch(netErr){
-        lastErr = netErr;
-        console.warn('[Cyberfort form] network error for ' + url, netErr);
+    for(const at of attempts){
+      const body = new URLSearchParams(at.fields).toString();
+      const seen = [];
+      for(const url of at.targets){
+        if(seen.indexOf(url) !== -1) continue;
+        seen.push(url);
+        try{
+          const res = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body
+          });
+          if(res.ok){ console.info('[Cyberfort form] sent via ' + at.form + ' (' + url + ')'); return; }
+          lastErr = new Error('HTTP ' + res.status + ' for form "' + at.form + '" at ' + url);
+          console.warn('[Cyberfort form] ' + lastErr.message);
+        }catch(netErr){
+          lastErr = netErr;
+          console.warn('[Cyberfort form] network error for ' + at.form + ' at ' + url, netErr);
+        }
       }
     }
     throw lastErr || new Error('Form submit failed');
