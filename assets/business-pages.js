@@ -173,6 +173,37 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     if(e.key === 'Escape' && !backdrop.hidden) closeContactModal();
   });
 
+  // Sends the form to Netlify Forms (same urlencoded POST the homepage uses).
+  // Tries "/" first (proven to work on the homepage), then the current page path as a fallback.
+  // The real HTTP status of every attempt is logged in the browser console to make problems easy to diagnose.
+  async function sendToNetlify(){
+    const data = new FormData(form);
+    // Netlify identifies the form by "form-name" – make sure it is always present
+    data.set('form-name', form.getAttribute('name') || 'email-modal-form');
+    const body = new URLSearchParams(data).toString();
+    const targets = [];
+    [window.CF_FORM_ENDPOINT, '/', window.location.pathname].forEach(function(u){
+      if(u && targets.indexOf(u) === -1) targets.push(u);
+    });
+    let lastErr = null;
+    for(const url of targets){
+      try{
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body
+        });
+        if(res.ok) return;
+        lastErr = new Error('HTTP ' + res.status + ' from ' + url);
+        console.warn('[Cyberfort form] ' + lastErr.message);
+      }catch(netErr){
+        lastErr = netErr;
+        console.warn('[Cyberfort form] network error for ' + url, netErr);
+      }
+    }
+    throw lastErr || new Error('Form submit failed');
+  }
+
   form.addEventListener('submit', async function(e){
     e.preventDefault();
     const t = i18n[curLang()] || i18n.sv;
@@ -180,14 +211,7 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     submitBtn.textContent = t.sending;
     statusEl.hidden = true;
     try{
-      const endpoint = window.CF_FORM_ENDPOINT || '/';
-      const body = new URLSearchParams(new FormData(form)).toString();
-      const res = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body
-      });
-      if(!res.ok) throw new Error('HTTP ' + res.status);
+      await sendToNetlify();
       form.hidden = true;
       doneEl.hidden = false;
       statusEl.className = 'cf-modal-status ok';
