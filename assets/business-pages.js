@@ -180,8 +180,9 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     submitBtn.textContent = t.sending;
     statusEl.hidden = true;
     try{
+      const endpoint = window.CF_FORM_ENDPOINT || '/';
       const body = new URLSearchParams(new FormData(form)).toString();
-      const res = await fetch('/', {
+      const res = await fetch(endpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         body
