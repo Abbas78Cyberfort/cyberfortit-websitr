@@ -13,3 +13,155 @@ function render(){document.documentElement.lang=lang;document.querySelectorAll('
  if(langBtn)langBtn.textContent=lang==='sv'?'EN':'SV';document.title=document.body.dataset.page==='restaurant'?(lang==='sv'?'Webblösningar för restauranger | Cyberfort IT':'Restaurant Solutions | Cyberfort IT'):(lang==='sv'?'Webbplatser för företag | Cyberfort IT':'Business Websites | Cyberfort IT');}
 langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.setItem('cf-page-lang',lang);render()});document.getElementById('mobileToggle')?.addEventListener('click',()=>document.getElementById('mobileMenu').classList.toggle('open'));document.getElementById('year').textContent=new Date().getFullYear();render();
 })();
+/* Guard: remove any injected "Powered by Netlify" badge */
+(function(){
+  function kill(n){try{if(n.nodeType!==1)return;var t=(n.id||'')+' '+(n.className&&n.className.baseVal===undefined?n.className:'')+' '+(n.getAttribute('href')||'')+' '+(n.getAttribute('src')||'');if(/netlify-badge|netlify\.com\/\?utm|netlify\.com\/drop/i.test(t)||(n.tagName==='IFRAME'&&/netlify/i.test(t)))n.remove();}catch(e){}}
+  function sweep(){document.querySelectorAll('[id*="netlify-badge"],[class*="netlify-badge"],iframe[src*="netlify"],a[href*="netlify.com/?utm"],a[href*="app.netlify.com/drop"]').forEach(function(n){n.remove()})}
+  try{new MutationObserver(function(m){m.forEach(function(r){r.addedNodes.forEach(kill)});sweep()}).observe(document.documentElement,{childList:true,subtree:true})}catch(e){}
+  sweep();
+})();
+
+/* Bilingual (SV/EN) rule-based Cyberfort Assistant chatbot */
+(function(){
+  if(document.getElementById('chatLaunch')) return;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `<div class="chatbox" id="chatbox"><div class="chathead"><span>CYBERFORT ASSISTANT • SV / EN</span><button id="closeChat" type="button" aria-label="Stäng">×</button></div><div class="chatmsgs" id="chatmsgs"><div class="msg">Hej! Välkommen till Cyberfort IT. Fråga mig om våra tjänster.<br>Hi! Welcome to Cyberfort IT. Ask me about our services.</div></div><div class="chatinput"><input id="chatInput" placeholder="Skriv / Type your question…"><button id="chatSend" type="button">Skicka / Send</button></div></div><button class="chat-launch" id="chatLaunch" type="button" aria-label="Öppna chat"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:block;margin:auto"><path d="M21 11.5a8.4 8.4 0 0 1-8.5 8.3 8.9 8.9 0 0 1-3.6-.8L3 21l1.9-5A8.1 8.1 0 0 1 4 11.5 8.4 8.4 0 0 1 12.5 3.2 8.4 8.4 0 0 1 21 11.5Z"/><path d="M8.5 10.5h8M8.5 13.5h5"/></svg></button>`;
+  while(wrap.firstChild) document.body.appendChild(wrap.firstChild);
+
+  const services = {
+    en:[
+      ['🛡️','Cybersecurity Assessment','Identify vulnerabilities, evaluate risks and build a practical security improvement plan.'],
+      ['⌁','Authorised Penetration Testing','Controlled security testing to uncover weaknesses in websites, applications and systems.'],
+      ['🔐','Security Policies & Risk Management','Security policies, risk registers, procedures and governance support.'],
+      ['☁️','Cloud & Microsoft 365 Security','Secure configuration and administration for Microsoft 365, Entra ID and cloud environments.'],
+      ['🖧','IT Infrastructure Management','Planning, maintenance and optimisation of networks, servers, devices and IT environments.'],
+      ['📡','Network Security','Firewall configuration, secure Wi-Fi, network segmentation and access controls.'],
+      ['🚨','Incident Response Guidance','Practical support with incident handling, recovery planning and lessons learned.'],
+      ['💻','IT Support & Troubleshooting','Technical support for computers, software, operating systems and everyday IT issues.'],
+      ['🖥️','Computer Repair','Diagnostics, repair, upgrades, virus removal and maintenance for desktop and laptop computers.'],
+      ['📱','Mobile Phone Repair','Screen, battery and charging-port repairs, plus troubleshooting and setup for mobile phones.'],
+      ['📲','Tablet Repair','Diagnostics and repair of tablets, including screens, batteries and software problems.'],
+      ['🏢','Employee Training for Companies','Tailored cybersecurity and digital-safety training that helps your staff spot phishing and handle data safely.'],
+      ['🎓','Training for Schools','Age-appropriate education for students and teachers on online safety, passwords, phishing and digital habits.'],
+      ['🌐','Web Design & Business Websites','Modern, responsive websites for companies, salons and service businesses designed around your brand and customers.'],
+      ['🍽️','Restaurant Web & Ordering Solutions','Digital menus, direct online ordering, Stripe payments and Telegram order notifications without third-party app fees.'],
+      ['📈','SEO & Digital Visibility','Technical SEO, website performance and improvements to search visibility.'],
+      ['🛡️','Compliance & Standards Support','Guidance related to ISO 27001, GDPR, NIS2 and recognised security frameworks.'],
+      ['💾','Backup & Recovery Planning','Backup strategy, recovery procedures and business continuity preparation.'],
+      ['🔎','IT Audit & Documentation','Review of IT environments, asset documentation and prioritised recommendations.']
+    ],
+    sv:[
+      ['🛡️','Cybersäkerhetsanalys','Identifiering av sårbarheter, riskbedömning och en praktisk plan för förbättrad säkerhet.'],
+      ['⌁','Auktoriserade penetrationstester','Kontrollerade säkerhetstester för att hitta svagheter i webbplatser, applikationer och system.'],
+      ['🔐','Säkerhetspolicy & riskhantering','Stöd med säkerhetspolicyer, riskregister, rutiner och styrning.'],
+      ['☁️','Moln- & Microsoft 365-säkerhet','Säker konfiguration och administration av Microsoft 365, Entra ID och molnmiljöer.'],
+      ['🖧','IT-infrastruktur & drift','Planering, underhåll och optimering av nätverk, servrar, enheter och IT-miljöer.'],
+      ['📡','Nätverkssäkerhet','Brandväggar, säkert Wi-Fi, nätverkssegmentering och åtkomstkontroller.'],
+      ['🚨','Stöd vid säkerhetsincidenter','Praktiskt stöd vid incidenthantering, återställning och uppföljning.'],
+      ['💻','IT-support & felsökning','Teknisk support för datorer, programvara, operativsystem och vardagliga IT-problem.'],
+      ['🖥️','Datorreparation','Felsökning, reparation, uppgraderingar, virusborttagning och underhåll av stationära och bärbara datorer.'],
+      ['📱','Mobilreparation','Byte av skärm, batteri och laddport samt felsökning och installation för mobiltelefoner.'],
+      ['📲','Surfplattereparation','Felsökning och reparation av surfplattor, inklusive skärm, batteri och programvaruproblem.'],
+      ['🏢','Personalutbildning för företag','Anpassad utbildning i cybersäkerhet och digital säkerhet som hjälper personalen att upptäcka nätfiske och hantera data säkert.'],
+      ['🎓','Utbildning för skolor','Åldersanpassad utbildning för elever och lärare om nätsäkerhet, lösenord, nätfiske och digitala vanor.'],
+      ['🌐','Webbdesign & företagswebbplatser','Moderna, responsiva webbplatser för företag, salonger och tjänsteföretag anpassade efter ert varumärke och era kunder.'],
+      ['🍽️','Webblösningar & direktbeställning för restauranger','Digital meny, direktbeställning online, Stripe-betalning och ordernotiser via Telegram utan dyra mellanhänder.'],
+      ['📈','SEO & digital synlighet','Teknisk SEO, webbplatsprestanda och förbättrad synlighet i sökmotorer.'],
+      ['🛡️','Stöd för regelefterlevnad','Vägledning kring ISO 27001, GDPR, NIS2 och etablerade säkerhetsramverk.'],
+      ['💾','Säkerhetskopiering & återställning','Strategi för säkerhetskopiering, återställningsrutiner och kontinuitetsplanering.'],
+      ['🔎','IT-granskning & dokumentation','Genomgång av IT-miljöer, dokumentation av tillgångar och prioriterade rekommendationer.']
+    ]
+  };
+
+  const KB_KEYS=[
+    ['assessment','vulnerab','sarbarhet','sakerhetsanalys','riskbedom','security check','sakerhetskoll','cybersakerhetsanalys'],
+    ['penetration','pentest','pen test','hack','ethical','sakerhetstest','penetrationstest'],
+    ['policy','policies','policyer','risk management','riskhantering','governance','riskregister','styrning','rutiner'],
+    ['microsoft','365','office','entra','azure','cloud','moln','intune','m365'],
+    ['infrastructure','infrastruktur','server','it-miljo','it environment','drift'],
+    ['network','natverk','firewall','brandvagg','wifi','wi-fi','vpn','segmentering','router'],
+    ['incident','breach','attack','hacked','hackad','ransomware','intrang','dataintrang','angrepp','sakerhetsincident'],
+    ['it support','it-support','support','troubleshoot','felsok','help desk','helpdesk','teknisk hjalp','technical help','problem'],
+    ['computer','laptop','pc','dator','datorer','bardbar','repair','reparation','reparera','fix','broken','trasig','virus','upgrade','uppgrader','windows','macbook','repareras'],
+    ['mobile','phone','iphone','android','smartphone','mobil','mobiler','mobiltelefon','telefon','skarm','screen','battery','batteri','laddport','charging'],
+    ['tablet','ipad','surfplatta','surfplattor'],
+    ['employee','staff','personal','company training','corporate','anstallda','medarbetare','awareness','phishing','natfiske','training','utbildning','course','kurs','education'],
+    ['school','skola','skolor','student','elev','larare','teacher','pupil'],
+    ['website','web design','webbdesign','webbplats','hemsida','homepage','web','site','webbsida','business website','foretagswebbplats','salon','salong','barber'],
+    ['restaurant','restaurang','pizzeria','menu','meny','order','bestallning','stripe','telegram','qr','takeaway','avhamtning','foodora','wolt'],
+    ['seo','search engine','sokmotor','google ranking','visibility','synlighet'],
+    ['iso','nis2','gdpr','compliance','standard','regelefterlevnad','certif','nist','27001'],
+    ['backup','sakerhetskopi','recovery','aterstall','restore','continuity','kontinuitet','data loss','dataforlust'],
+    ['audit','granskning','documentation','dokumentation','inventory','it review']
+  ];
+
+  const norm=s=>s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  const hasKey=(m,k)=>k.length<=3?new RegExp('(^|[^a-z0-9])'+k.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'([^a-z0-9]|$)').test(m):m.includes(k);
+  const anyKey=(m,arr)=>arr.some(k=>hasKey(m,k));
+  const SEC={
+    en:'our secretary Mojgan Abolhasani – <a href="tel:+46764113589">076-411 35 89</a> · <a href="mailto:info@cyberfortit.se">info@cyberfortit.se</a>',
+    sv:'vår sekreterare Mojgan Abolhasani – <a href="tel:+46764113589">076-411 35 89</a> · <a href="mailto:info@cyberfortit.se">info@cyberfortit.se</a>'
+  };
+  const SV_W=['och','jag','ar','inte','vad','hur','kan','ni','har','behover','vill','hej','hejsan','tack','min','mitt','din','ert','ett','det','med','pa','till','tjanst','tjanster','erbjuder','hjalp','vilka','finns','er','oss','mig','vilken','nar','kostar','gor'];
+  const EN_W=['the','and','you','what','how','can','do','does','is','are','have','need','want','my','your','with','hello','hi','please','services','offer','help','which','where','when','much','price','cost','of','for','a'];
+
+  function detectLang(raw){
+    const m=norm(raw),w=m.split(/[^a-z]+/).filter(Boolean);
+    let sv=/[åäö]/i.test(raw)?2:0,en=0;
+    w.forEach(x=>{if(SV_W.includes(x))sv++;if(EN_W.includes(x))en++});
+    const currentLang=localStorage.getItem('cf-page-lang')||'sv';
+    return sv>en?'sv':en>sv?'en':currentLang;
+  }
+
+  function botReply(raw){
+    const m=norm(raw),L=detectLang(raw),sec=SEC[L];
+    const t=(en,sv)=>L==='sv'?sv:en;
+    const svc=services[L];
+    if(anyKey(m,['phone number','telefonnummer','your number','ditt nummer','ert nummer','e-post','epost','email','mejl','e-mail','contact','kontakt','call you','ring er','nummer','number']))
+      return t('You can reach us here:<br>☎ <a href="tel:+46764113589">076-411 35 89</a><br>✉ <a href="mailto:info@cyberfortit.se">info@cyberfortit.se</a><br>Secretary: Mojgan Abolhasani. CEO: Abbas Fathali.',
+               'Så här når du oss:<br>☎ <a href="tel:+46764113589">076-411 35 89</a><br>✉ <a href="mailto:info@cyberfortit.se">info@cyberfortit.se</a><br>Sekreterare: Mojgan Abolhasani. VD: Abbas Fathali.');
+    if(anyKey(m,['address','adress','where are you','var finns','var ligger','location','hitta hit','karta','map','visit']))
+      return t('We are at Bäverns gränd 12, 753 19 Uppsala, and we also work in Stockholm and nearby areas. See the map in the Contact section.',
+               'Vi finns på Bäverns gränd 12, 753 19 Uppsala och arbetar även i Stockholm och närliggande områden. Se kartan under Kontakt.');
+    const sc=KB_KEYS.map((ks,i)=>({i,s:ks.filter(k=>hasKey(m,k)).length})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
+    if(sc.length){
+      const top=sc.filter(x=>x.s===sc[0].s).slice(0,3);
+      const lines=top.map(x=>`${svc[x.i][0]} <b>${svc[x.i][1]}</b> – ${svc[x.i][2]}`).join('<br><br>');
+      return t('Yes, this is something we help with:<br><br>','Ja, det här hjälper vi till med:<br><br>')+lines+'<br><br>'+t('For a quote or to book, contact ','För offert eller bokning, kontakta ')+sec+'.';
+    }
+    if(/^\s*(hi|hello|hey|hej|hejsan|tjena|hallo|god (dag|morgon|kvall)|good (morning|afternoon|evening)|salam)/.test(m))
+      return t('Hello! Welcome to Cyberfort IT. Ask me about our services – for example websites, restaurant ordering solutions, cybersecurity or IT support.',
+               'Hej! Välkommen till Cyberfort IT. Fråga mig gärna om våra tjänster – till exempel webbplatser, restauranglösningar, cybersäkerhet eller IT-support.');
+    if(anyKey(m,['thank','tack','thanks','tnx','mersi','merci']))
+      return t('You are welcome! Let us know if you need anything else.','Varsågod! Hör av dig om du behöver något mer.');
+    if(anyKey(m,['service','tjanst','what do you','vad gor ni','erbjuder','offer','what can you','vad kan ni','help with','hjalp med']))
+      return t('Our services:<br>','Våra tjänster:<br>')+svc.map(s=>`${s[0]} ${s[1]}`).join('<br>')+'<br><br>'+t('Ask me about any of them for details.','Fråga om någon av dem för mer information.');
+    if(anyKey(m,['price','pris','cost','kostnad','kostar','quote','offert','how much','hur mycket','fee','avgift','rate']))
+      return t('Prices depend on the job, so we do not list them on the site. For a quote, contact ','Priset beror på uppdraget, så vi anger inga priser på sidan. För offert, kontakta ')+sec+'.';
+    if(anyKey(m,['hours','open','oppet','oppettid','opening','when are you','nar har ni']))
+      return t('For opening hours, please contact ','För öppettider, kontakta ')+sec+'.';
+    if(anyKey(m,['book','boka','appointment','consult','radgivning','meeting','mote','tid']))
+      return t('You can book a consultation via <a href="/#contact">our Contact section</a> or through ','Du kan boka rådgivning via <a href="/#contact">vår kontaktsida</a> eller via ')+sec+'.';
+    if(anyKey(m,['who are you','vilka ar ni','about','om oss','ceo','vd','boss','team','abbas','mojgan','founder']))
+      return t('Cyberfort IT – Future Secured. We are an independent IT and cybersecurity company in Uppsala. The CEO is Abbas Fathali (Cyber Security Engineer) and our secretary is Mojgan Abolhasani.',
+               'Cyberfort IT – Framtiden säkrad. Vi är ett oberoende IT- och cybersäkerhetsföretag i Uppsala. VD är Abbas Fathali (cybersäkerhetsingenjör) och sekreterare är Mojgan Abolhasani.');
+    if(anyKey(m,['language','sprak','persian','farsi','svenska','swedish','english','engelska','persiska']))
+      return t('We can help in Swedish, English and Persian.','Vi hjälper dig på svenska, engelska och persiska.');
+    return t('I could not find that among our services, so I do not want to guess. Please contact ','Jag hittar inte det bland våra tjänster och vill inte gissa. Kontakta gärna ')+sec+t('. You can also ask me what services we offer.','. Du kan också fråga mig vilka tjänster vi erbjuder.');
+  }
+
+  const chatbox=document.getElementById('chatbox');
+  document.getElementById('chatLaunch').onclick=()=>chatbox.classList.toggle('open');
+  document.getElementById('closeChat').onclick=()=>chatbox.classList.remove('open');
+  function chatSend(){
+    const input=document.getElementById('chatInput'),v=input.value.trim();
+    if(!v)return;
+    const msgs=document.getElementById('chatmsgs');
+    const u=document.createElement('div');u.className='msg user';u.textContent=v;msgs.appendChild(u);input.value='';
+    const b=document.createElement('div');b.className='msg';b.innerHTML=botReply(v);
+    setTimeout(()=>{msgs.appendChild(b);msgs.scrollTop=msgs.scrollHeight},450);
+    msgs.scrollTop=msgs.scrollHeight;
+  }
+  document.getElementById('chatSend').onclick=chatSend;
+  document.getElementById('chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')chatSend()});
+})();
