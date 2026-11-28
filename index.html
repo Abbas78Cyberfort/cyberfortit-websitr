@@ -355,12 +355,12 @@ a[href^="tel:"]:hover,a[href^="mailto:"]:hover{text-decoration:underline;text-un
 .matrix-col{will-change:transform}
 @media(max-width:600px){.modal-box .form .two{grid-template-columns:1fr}}
 
-/* chat button sits above the floating Netlify badge (bottom-right) */
-.chat-launch{bottom:calc(88px + env(safe-area-inset-bottom,0px))}
-.chatbox{bottom:calc(158px + env(safe-area-inset-bottom,0px));max-height:calc(100vh - 178px);display:none;flex-direction:column}
+/* chat button sits in its standard bottom-right corner */
+.chat-launch{right:23px;bottom:calc(22px + env(safe-area-inset-bottom,0px))}
+.chatbox{right:23px;bottom:calc(92px + env(safe-area-inset-bottom,0px));max-height:calc(100vh - 112px);display:none;flex-direction:column}
 .chatbox.open{display:flex}
 .chatbox .chatmsgs{height:250px;min-height:90px;flex:1 1 auto}
-@media(max-width:600px){.chat-launch{right:14px;bottom:calc(88px + env(safe-area-inset-bottom,0px))}.chatbox{right:12px;bottom:calc(158px + env(safe-area-inset-bottom,0px))}}
+@media(max-width:600px){.chat-launch{right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}.chatbox{right:12px;bottom:calc(82px + env(safe-area-inset-bottom,0px))}}
 /* top ticker: moves on every screen size and never widens the page */
 .ticker{max-width:100%;overflow:hidden}
 .ticker-track{will-change:transform}
