@@ -62,7 +62,7 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
         <p hidden><label>Do not fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
         <input id="cfNameInput" name="name" type="text" required placeholder="Name">
         <input id="cfEmailInput" name="email" type="email" required placeholder="Email">
-        <label class="cf-field-label" id="cfSubjectLabel" for="cfSubjectSelect">What do you need help with?</label>
+        <label class="cf-field-label" id="cfSubjectLabel" for="cfSubjectSelect">Vad behöver du hjälp med?</label>
         <select id="cfSubjectSelect" name="subject" required aria-label="What do you need help with?"></select>
         <textarea id="cfMsgInput" name="message" required placeholder="Message"></textarea>
         <button class="btn" id="cfModalSubmit" type="submit">Send Message ↗</button>
@@ -86,35 +86,55 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
   const msgInput = document.getElementById('cfMsgInput');
 
   const subjectOptions = {
-    business: [
-      'New Website Design',
-      'Website Redesign',
-      'E-commerce / Online Store',
-      'SEO & Google Visibility',
-      'Website Maintenance & Security',
-      'Other / General Inquiry'
-    ],
-    restaurant: [
-      'Online Ordering System',
-      'Digital QR Menu',
-      'Online Payments',
-      'Restaurant Website',
-      'Order Management System',
-      'Other / General Inquiry'
-    ]
+    business: {
+      sv: [
+        'Ny webbplatsdesign',
+        'Omdesign av webbplats',
+        'E-handel / Webbshop',
+        'SEO & synlighet på Google',
+        'Webbplatsunderhåll & säkerhet',
+        'Annat / Allmän förfrågan'
+      ],
+      en: [
+        'New Website Design',
+        'Website Redesign',
+        'E-commerce / Online Store',
+        'SEO & Google Visibility',
+        'Website Maintenance & Security',
+        'Other / General Inquiry'
+      ]
+    },
+    restaurant: {
+      sv: [
+        'Beställningssystem online',
+        'Digital QR-meny',
+        'Onlinebetalningar',
+        'Restaurangwebbplats',
+        'Orderhanteringssystem',
+        'Annat / Allmän förfrågan'
+      ],
+      en: [
+        'Online Ordering System',
+        'Digital QR Menu',
+        'Online Payments',
+        'Restaurant Website',
+        'Order Management System',
+        'Other / General Inquiry'
+      ]
+    }
   };
 
   const i18n = {
     sv: {
       title: 'Skriv till oss',
       to: 'Till',
-      namePh: 'Name',
-      emailPh: 'Email',
-      subjFieldLabel: 'What do you need help with?',
-      subjPlaceholder: 'Select a Service',
-      subjRequiredMsg: 'Please select a service from the list.',
-      msgPh: 'Message',
-      send: 'Send Message ↗',
+      namePh: 'Namn',
+      emailPh: 'E-post',
+      subjFieldLabel: 'Vad behöver du hjälp med?',
+      subjPlaceholder: 'Välj en tjänst',
+      subjRequiredMsg: 'Välj en tjänst från listan.',
+      msgPh: 'Meddelande',
+      send: 'Skicka meddelande ↗',
       sending: 'SKICKAR…',
       ok: 'Tack! Ditt meddelande har skickats till Cyberfort IT. Vi återkommer så snart vi kan.',
       err: 'Tyvärr gick något fel och meddelandet skickades inte. Försök igen eller ring <a href="tel:+46764113589">076-411 35 89</a>.',
@@ -142,10 +162,13 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
   }
 
   function populateSubjects(preferredSubj){
-    const L = curLang();
+    const L = curLang() === 'en' ? 'en' : 'sv';
+    const otherLang = L === 'sv' ? 'en' : 'sv';
     const t = i18n[L] || i18n.sv;
     const pageType = document.body.dataset.page === 'restaurant' ? 'restaurant' : 'business';
-    const list = subjectOptions[pageType] || subjectOptions.business;
+    const pageGroup = subjectOptions[pageType] || subjectOptions.business;
+    const list = pageGroup[L] || pageGroup.sv;
+    const otherList = pageGroup[otherLang] || [];
     const prevVal = (preferredSubj !== undefined) ? preferredSubj : subjectSelect.value;
 
     subjectSelect.innerHTML = '';
@@ -156,11 +179,13 @@ langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.s
     subjectSelect.appendChild(phOpt);
 
     let matched = false;
-    list.forEach(item => {
+    list.forEach((item, idx) => {
       const opt = document.createElement('option');
       opt.value = item;
       opt.textContent = item;
-      if(prevVal && prevVal.toLowerCase() === item.toLowerCase()){
+      const prevLower = (prevVal || '').toLowerCase();
+      const otherItem = (otherList[idx] || '').toLowerCase();
+      if(prevVal && (prevLower === item.toLowerCase() || (otherItem && prevLower === otherItem))){
         opt.selected = true;
         matched = true;
       }
