@@ -7,11 +7,11 @@
 .netlify-badge,#netlify-badge,[class*="netlify-badge"],[id*="netlify-badge"],a[href*="netlify.com/?utm"],a[href*="app.netlify.com/drop"],a[href^="https://www.netlify.com"][target="_blank"]:not(.keep),iframe[src*="netlify"],iframe[title*="Netlify" i],div[style*="netlify" i]{display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;width:0!important;height:0!important}
 
 /* Cyberfort Assistant Chatbot (bottom-right) */
-.chat-launch{position:fixed;right:23px;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:50;width:58px;height:58px;border:0;border-radius:50%;background:var(--green);color:#001526;font-size:23px;box-shadow:0 0 25px rgba(45,180,255,.45);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s}
+.chat-launch{position:fixed;right:23px;bottom:calc(22px + env(safe-area-inset-bottom,0px));z-index:50;width:58px;height:58px;border:0;border-radius:50%;background:linear-gradient(135deg,#38bdf8,#0284c7);color:#02101d;font-size:23px;box-shadow:0 0 25px rgba(56,189,248,.45);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .2s}
 .chat-launch:hover{transform:translateY(-2px)}
 .chatbox{position:fixed;right:23px;bottom:calc(92px + env(safe-area-inset-bottom,0px));width:min(360px,calc(100vw - 35px));max-height:calc(100vh - 112px);z-index:50;background:#050d18;border:1px solid rgba(45,180,255,.45);border-radius:14px;overflow:hidden;box-shadow:0 15px 60px #000;display:none;flex-direction:column}
 .chatbox.open{display:flex}
-.chathead{padding:15px;background:#08213a;color:#7ef7c2;font:11px 'DM Mono',monospace;display:flex;justify-content:space-between;align-items:center}
+.chathead{padding:15px;background:#08213a;color:var(--cyan);font:11px 'DM Mono',monospace;display:flex;justify-content:space-between;align-items:center}
 .chathead button{background:none;border:0;color:white;font-size:20px;cursor:pointer;line-height:1}
 .chatmsgs{height:250px;min-height:90px;flex:1 1 auto;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px;font-size:12px;line-height:1.65}
 .msg{padding:10px 12px;border-radius:9px;background:#0f1e30;color:#c4d6e6;max-width:92%}
@@ -19,5 +19,25 @@
 .msg.user{align-self:flex-end;background:#124a78;color:white}
 .chatinput{display:flex;padding:10px;border-top:1px solid var(--line);gap:7px}
 .chatinput input{min-width:0;flex:1;background:#020710;border:1px solid #234563;color:white;padding:10px;border-radius:7px;font-size:12px}
-.chatinput button{background:var(--green);color:#001526;font-weight:600;border:0;border-radius:7px;padding:0 13px;font:11px 'DM Mono',monospace;cursor:pointer}
+.chatinput button{background:linear-gradient(135deg,#38bdf8,#0284c7);color:#02101d;font-weight:700;border:0;border-radius:7px;padding:0 13px;font:11px 'DM Mono',monospace;cursor:pointer}
 @media(max-width:600px){.chat-launch{right:14px;bottom:calc(14px + env(safe-area-inset-bottom,0px))}.chatbox{right:12px;bottom:calc(82px + env(safe-area-inset-bottom,0px))}}
+/* Contact Modal on Business & Restaurant Pages */
+.cf-modal-backdrop{position:fixed;inset:0;z-index:80;background:rgba(1,6,14,.78);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;padding:18px}
+.cf-modal-backdrop.open{display:flex}
+.cf-modal-box{position:relative;width:min(480px,100%);max-height:90vh;overflow:auto;background:linear-gradient(155deg,#071627,#040d18);border:1px solid rgba(88,196,255,.35);border-radius:16px;padding:26px 24px;box-shadow:0 24px 70px rgba(0,0,0,.65);color:var(--text)}
+.cf-modal-close{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:8px;border:1px solid var(--line);background:rgba(8,24,41,.8);color:#c8dced;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.cf-modal-close:hover{border-color:var(--cyan);color:var(--cyan)}
+.cf-modal-icon{font-size:24px;margin-bottom:6px}
+.cf-modal-box h3{margin:0 0 6px;font:700 20px Orbitron,sans-serif;color:var(--text)}
+.cf-to-line{margin:0 0 16px;font-size:12px;color:var(--muted);font-family:'DM Mono',monospace}
+.cf-to-line b{color:var(--cyan);font-weight:500}
+.cf-modal-form{display:grid;gap:12px}
+.cf-modal-form input,.cf-modal-form textarea{width:100%;padding:12px 13px;background:#020812;border:1px solid rgba(88,196,255,.22);border-radius:9px;color:#fff;font-family:Inter,Arial,sans-serif;font-size:13px;outline:none}
+.cf-modal-form input:focus,.cf-modal-form textarea:focus{border-color:var(--cyan)}
+.cf-modal-form textarea{min-height:118px;resize:vertical}
+.cf-modal-status{margin-top:12px;padding:11px 13px;border-radius:9px;font-size:12px;line-height:1.55}
+.cf-modal-status.ok{background:rgba(22,133,189,.18);border:1px solid rgba(88,196,255,.45);color:#bfeaff}
+.cf-modal-status.err{background:rgba(220,38,38,.16);border:1px solid rgba(248,113,113,.45);color:#fecaca}
+.cf-modal-done{margin-top:14px}
+.footer-sign{width:100%;text-align:center;margin-top:10px;padding-top:12px;border-top:1px solid rgba(95,177,225,.12);color:#7f9cb2;font-size:12px}
+.footer-sign a{color:var(--cyan)}

@@ -13,6 +13,198 @@ function render(){document.documentElement.lang=lang;document.querySelectorAll('
  if(langBtn)langBtn.textContent=lang==='sv'?'EN':'SV';document.title=document.body.dataset.page==='restaurant'?(lang==='sv'?'Webblösningar för restauranger | Cyberfort IT':'Restaurant Solutions | Cyberfort IT'):(lang==='sv'?'Webbplatser för företag | Cyberfort IT':'Business Websites | Cyberfort IT');}
 langBtn?.addEventListener('click',()=>{lang=lang==='sv'?'en':'sv';localStorage.setItem('cf-page-lang',lang);render()});document.getElementById('mobileToggle')?.addEventListener('click',()=>document.getElementById('mobileMenu').classList.toggle('open'));document.getElementById('year').textContent=new Date().getFullYear();render();
 })();
+
+/* Footer signature matching homepage ("Webbplatsen är byggd och utvecklad av Cyberfort IT") */
+(function(){
+  const footer = document.querySelector('footer.footer');
+  if(!footer) return;
+  let sign = footer.querySelector('.footer-sign');
+  if(!sign){
+    sign = document.createElement('div');
+    sign.className = 'footer-sign';
+    const shell = footer.querySelector('.shell') || footer;
+    shell.appendChild(sign);
+  }
+  function updateSign(){
+    const curLang = localStorage.getItem('cf-page-lang') || document.documentElement.lang || 'sv';
+    sign.innerHTML = curLang === 'en'
+      ? 'This website is built and developed by <a href="https://cyberfortit.se">Cyberfort IT</a> – <a href="https://cyberfortit.se">cyberfortit.se</a>'
+      : 'Webbplatsen är byggd och utvecklad av <a href="https://cyberfortit.se">Cyberfort IT</a> – <a href="https://cyberfortit.se">cyberfortit.se</a>';
+  }
+  updateSign();
+  document.getElementById('langBtn')?.addEventListener('click',()=>setTimeout(updateSign,0));
+})();
+
+/* Contact Modal for mailto links (instead of opening Gmail app, sends to info@cyberfortit.se) */
+(function(){
+  if(document.getElementById('cfContactModal')) return;
+  const DEFAULT_EMAIL = 'info@cyberfortit.se';
+  const backdrop = document.createElement('div');
+  backdrop.className = 'cf-modal-backdrop';
+  backdrop.id = 'cfContactModal';
+  backdrop.setAttribute('role','dialog');
+  backdrop.setAttribute('aria-modal','true');
+  backdrop.setAttribute('aria-labelledby','cfModalTitle');
+  backdrop.hidden = true;
+  backdrop.innerHTML = `
+    <div class="cf-modal-box">
+      <button class="cf-modal-close" id="cfModalClose" type="button" aria-label="Stäng">×</button>
+      <div class="cf-modal-icon" aria-hidden="true">✉️</div>
+      <h3 id="cfModalTitle">Skriv till oss</h3>
+      <p class="cf-to-line"><span id="cfToLabel">Till</span>: <b id="cfModalTo">${DEFAULT_EMAIL}</b></p>
+      <form class="cf-modal-form" id="cfModalForm" name="email-modal-form" method="POST" data-netlify="true" data-netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="email-modal-form">
+        <input type="hidden" name="recipient" id="cfModalRecipient" value="${DEFAULT_EMAIL}">
+        <input type="hidden" name="subject" id="cfModalSubject" value="">
+        <p hidden><label>Do not fill this out: <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <input id="cfNameInput" name="name" type="text" required placeholder="Ditt namn">
+        <input id="cfEmailInput" name="email" type="email" required placeholder="Din e-postadress">
+        <textarea id="cfMsgInput" name="message" required placeholder="Skriv ditt meddelande..."></textarea>
+        <button class="btn" id="cfModalSubmit" type="submit">SKICKA MEDDELANDE ↗</button>
+      </form>
+      <div class="cf-modal-status" id="cfModalStatus" role="status" aria-live="polite" hidden></div>
+      <div class="cf-modal-done" id="cfModalDone" hidden>
+        <button class="btn" id="cfModalDoneBtn" type="button">STÄNG</button>
+      </div>
+    </div>`;
+  document.body.appendChild(backdrop);
+
+  const form = document.getElementById('cfModalForm');
+  const statusEl = document.getElementById('cfModalStatus');
+  const doneEl = document.getElementById('cfModalDone');
+  const closeBtn = document.getElementById('cfModalClose');
+  const doneBtn = document.getElementById('cfModalDoneBtn');
+  const submitBtn = document.getElementById('cfModalSubmit');
+  const nameInput = document.getElementById('cfNameInput');
+  const emailInput = document.getElementById('cfEmailInput');
+  const msgInput = document.getElementById('cfMsgInput');
+
+  const i18n = {
+    sv: {
+      title: 'Skriv till oss',
+      to: 'Till',
+      namePh: 'Ditt namn',
+      emailPh: 'Din e-postadress',
+      msgPh: 'Skriv ditt meddelande...',
+      send: 'SKICKA MEDDELANDE ↗',
+      sending: 'SKICKAR…',
+      ok: 'Tack! Ditt meddelande har skickats till Cyberfort IT. Vi återkommer så snart vi kan.',
+      err: 'Tyvärr gick något fel och meddelandet skickades inte. Försök igen eller ring <a href="tel:+46764113589">076-411 35 89</a>.',
+      close: 'STÄNG'
+    },
+    en: {
+      title: 'Write to us',
+      to: 'To',
+      namePh: 'Your name',
+      emailPh: 'Your email',
+      msgPh: 'Write your message...',
+      send: 'SEND MESSAGE ↗',
+      sending: 'SENDING…',
+      ok: 'Thank you! Your message has been sent to Cyberfort IT. We will get back to you as soon as possible.',
+      err: 'Sorry, something went wrong and your message was not sent. Please try again or call <a href="tel:+46764113589">076-411 35 89</a>.',
+      close: 'CLOSE'
+    }
+  };
+
+  function curLang(){
+    return localStorage.getItem('cf-page-lang') || document.documentElement.lang || 'sv';
+  }
+
+  function applyModalTexts(){
+    const t = i18n[curLang()] || i18n.sv;
+    document.getElementById('cfModalTitle').textContent = t.title;
+    document.getElementById('cfToLabel').textContent = t.to;
+    nameInput.placeholder = t.namePh;
+    emailInput.placeholder = t.emailPh;
+    msgInput.placeholder = t.msgPh;
+    if(!submitBtn.disabled) submitBtn.textContent = t.send;
+    doneBtn.textContent = t.close;
+  }
+
+  function openContactModal(addr, subj){
+    const targetAddr = (addr && addr.trim()) ? addr.trim() : DEFAULT_EMAIL;
+    document.getElementById('cfModalTo').textContent = targetAddr;
+    document.getElementById('cfModalRecipient').value = targetAddr;
+    document.getElementById('cfModalSubject').value = subj || '';
+    form.hidden = false;
+    form.reset();
+    document.getElementById('cfModalRecipient').value = targetAddr;
+    document.getElementById('cfModalSubject').value = subj || '';
+    statusEl.hidden = true;
+    statusEl.className = 'cf-modal-status';
+    statusEl.innerHTML = '';
+    doneEl.hidden = true;
+    applyModalTexts();
+    backdrop.hidden = false;
+    backdrop.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    setTimeout(()=>nameInput.focus(), 20);
+  }
+
+  function closeContactModal(){
+    backdrop.classList.remove('open');
+    backdrop.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('click', function(e){
+    const mailLink = e.target.closest('a[href^="mailto:" i]');
+    if(mailLink){
+      e.preventDefault();
+      const rawHref = mailLink.getAttribute('href') || '';
+      const afterMailto = rawHref.replace(/^mailto:/i, '');
+      const parts = afterMailto.split('?');
+      const addr = decodeURIComponent(parts[0] || DEFAULT_EMAIL) || DEFAULT_EMAIL;
+      let subj = '';
+      if(parts[1]){
+        const params = new URLSearchParams(parts[1]);
+        subj = params.get('subject') || '';
+      }
+      openContactModal(addr, subj);
+    }
+  });
+
+  closeBtn.addEventListener('click', closeContactModal);
+  doneBtn.addEventListener('click', closeContactModal);
+  backdrop.addEventListener('click', function(e){
+    if(e.target === backdrop) closeContactModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && !backdrop.hidden) closeContactModal();
+  });
+
+  form.addEventListener('submit', async function(e){
+    e.preventDefault();
+    const t = i18n[curLang()] || i18n.sv;
+    submitBtn.disabled = true;
+    submitBtn.textContent = t.sending;
+    statusEl.hidden = true;
+    try{
+      const body = new URLSearchParams(new FormData(form)).toString();
+      const res = await fetch('/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body
+      });
+      if(!res.ok) throw new Error('HTTP ' + res.status);
+      form.hidden = true;
+      doneEl.hidden = false;
+      statusEl.className = 'cf-modal-status ok';
+      statusEl.innerHTML = t.ok;
+      statusEl.hidden = false;
+    }catch(err){
+      statusEl.className = 'cf-modal-status err';
+      statusEl.innerHTML = t.err;
+      statusEl.hidden = false;
+    }finally{
+      submitBtn.disabled = false;
+      submitBtn.textContent = t.send;
+    }
+  });
+
+  document.getElementById('langBtn')?.addEventListener('click',()=>setTimeout(applyModalTexts,0));
+})();
+
 /* Guard: remove any injected "Powered by Netlify" badge */
 (function(){
   function kill(n){try{if(n.nodeType!==1)return;var t=(n.id||'')+' '+(n.className&&n.className.baseVal===undefined?n.className:'')+' '+(n.getAttribute('href')||'')+' '+(n.getAttribute('src')||'');if(/netlify-badge|netlify\.com\/\?utm|netlify\.com\/drop/i.test(t)||(n.tagName==='IFRAME'&&/netlify/i.test(t)))n.remove();}catch(e){}}
